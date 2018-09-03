@@ -1,0 +1,37 @@
+apiVersion: v1
+kind: Template
+labels:
+  template: jenkins-pipeline
+metadata:
+  name: jenkins-pipeline
+objects:
+- apiVersion: v1
+  kind: BuildConfig
+  metadata:
+    labels:
+      build: todo-app-pipeline
+      app: todo-app
+    name: todo-app-pipeline
+  spec:
+    failedBuildsHistoryLimit: 5
+    runPolicy: Serial
+    source:
+      git:
+        uri: ${TODO_APP_REPOSITORY}
+      type: Git
+    strategy:
+      jenkinsPipelineStrategy:
+        jenkinsfilePath: infra/jenkins/Jenkinsfile
+      type: Source
+    successfulBuildsHistoryLimit: 5
+    triggers:
+    - imageChange: {}
+      type: ImageChange
+    - type: ConfigChange
+
+parameters:
+- name: TODO_APP_REPOSITORY
+  displayName: Repository url
+  description: The URL of the source repository
+  required: true
+  value: https://github.com/svettwer/Software-QS-Tag-2018
