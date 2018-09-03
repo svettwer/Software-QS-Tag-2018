@@ -1,6 +1,13 @@
-node{
+stage('dev') {
+    node{
+        checkout scm
 
-    checkout scm
+        openshift.withProject( "todo-app-dev" ) {
+            def buildTemplate = openshift.process("-f infra/yml/s2i-todo-app-build-template.yml")
+            openshift.apply(buildTemplate)
 
-
+            openshift.startBuild("todo-app", "--wait=true")
+        }
+    }
 }
+
