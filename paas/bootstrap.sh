@@ -20,6 +20,7 @@ oc new-project gogs
 oc new-app -f http://bit.ly/openshift-gogs-template --param=HOSTNAME=gogs.$(minishift ip).nip.io
 #First registered user is admin
 #Manual import of the sample app required https://github.com/citrusframework/todo-demo-app.git
+#Manual import of the infra code required https://github.com/svettwer/Software-QS-Tag-2018
 
 #Setup offline s2i build
 oc project openshift
