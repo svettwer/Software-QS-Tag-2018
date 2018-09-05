@@ -25,4 +25,4 @@ oc new-app -f http://bit.ly/openshift-gogs-template --param=HOSTNAME=gogs.$(mini
 #Setup offline s2i build
 oc project openshift
 oc process -f $(git rev-parse --show-toplevel)/paas/yml/s2i_spring_offline_build_template.yml | oc apply -f -
-oc start-build spring-offline-s2i
+oc start-build -w spring-offline-s2i
