@@ -24,23 +24,43 @@ stage('dev') {
 
 stage('int') {
     podTemplate(cloud: "openshift", namespace: "todo-app-int") {
-        node('maven'){
-            checkout scm
 
-            openshift.withProject( "todo-app-int" ) {
-                def deploymentTemplate = openshift.process("-f infra/yml/todo-app-deployment-template.yml",
-                        "-p", "URL=todo-app-int.192.168.99.101.nip.io")
-                openshift.apply(deploymentTemplate)
+        stage('integration-tests') {
+            node('maven'){
+                checkout scm
 
-                openshift.selector("dc/todo-app").rollout().latest()
-                openshift.selector("dc/todo-app").rollout().status("--watch=true")
+                openshift.withProject( "todo-app-int" ) {
+                    def deploymentTemplate = openshift.process("-f infra/yml/todo-app-deployment-template.yml",
+                            "-p", "URL=todo-app-int.192.168.99.101.nip.io")
+                    openshift.apply(deploymentTemplate)
+
+                    openshift.selector("dc/todo-app").rollout().latest()
+                    openshift.selector("dc/todo-app").rollout().status("--watch=true")
+                }
+
+                sh "mvn clean verify -Dskip.integration.tests=false"
+
+                openshift.withProject( "todo-app-int" ) {
+                    openshift.tag("todo-app-int/todo-app:latest todo-app-prod/todo-app:latest")
+                }
             }
+        }
 
-            sh "mvn clean verify -Dskip.integration.tests=false"
+        stage('e2e-tests'){
+            def buildTemplate = openshift.process("-f infra/yml/s2i-sakuli-build-template.yml",
+                    "-p", "TESTSUITE_REPOSITORY_URL=http://gogs.192.168.99.101.nip.io/sven/todo-app.git",
+                    "-p", "TESTSUITE_CONTEXT_DIR=e2e/testsuite")
+            openshift.apply(buildTemplate)
 
-            openshift.withProject( "todo-app-int" ) {
-                openshift.tag("todo-app-int/todo-app:latest todo-app-prod/todo-app:latest")
-            }
+            openshift.startBuild("sakuli-s2i-testsuite", "--wait=true")
+
+            sakuli-s2i-testsuite
+
+            openshift.run("sakuli-s2i-testsuite",
+                    "--image=172.30.1.1:5000/todo-app-int/sakuli-s2i-testsuite:latest",
+                    "--attach=true",
+                    "--rm",
+                    "--restart=Never")
         }
     }
 }
