@@ -14,8 +14,8 @@
     <spring.boot.version>1.5.10.RELEASE</spring.boot.version>
     <activemq.version>5.15.2</activemq.version>
     <slf4j.version>1.7.25</slf4j.version>
+    <application.name>todo-demo-app</application.name>
     <skipJaxb>true</skipJaxb>
-    <skip.integration.tests>true</skip.integration.tests>
   </properties>
 
   <licenses>
@@ -30,7 +30,7 @@
     <resources>
       <resource>
         <directory>src/main/resources</directory>
-        <targetPath>target/classes</targetPath>
+        <targetPath>${project.build.directory}/classes</targetPath>
       </resource>
     </resources>
     
@@ -83,8 +83,7 @@
         <version>2.20.1</version>
         <configuration>
           <failIfNoTests>false</failIfNoTests>
-          <workingDirectory>target</workingDirectory>
-          <skip>${skip.integration.tests}</skip>
+          <workingDirectory>${project.build.directory}</workingDirectory>
         </configuration>
       </plugin>
 
@@ -106,7 +105,7 @@
           <sources>
             <source>src/main/resources/schema/TodoList.xsd</source>
           </sources>
-          <outputDirectory>src/main/java</outputDirectory>
+          <outputDirectory>${project.basedir}/src/main/java</outputDirectory>
           <clearOutputDir>false</clearOutputDir>
           <xjbSources>
             <xjbSource>src/main/resources/schema/binding.xjb</xjbSource>
@@ -126,8 +125,6 @@
           </dependency>
         </dependencies>
       </plugin>
-
-
     </plugins>
 
     <extensions>
