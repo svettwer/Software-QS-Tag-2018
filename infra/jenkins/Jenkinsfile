@@ -22,26 +22,27 @@ stage('dev') {
 stage('int') {
     node{
 
-        def deploymentTemplate = openshift.process("-f infra/yml/todo-app-deployment-template.yml")
-        openshift.apply(deploymentTemplate)
+        openshift.withProject( "todo-app-int" ) {
+            def deploymentTemplate = openshift.process("-f infra/yml/todo-app-deployment-template.yml")
+            openshift.apply(deploymentTemplate)
 
-        openshift.selector("dc/todo-app").rollout().latest()
-        openshift.selector("dc/todo-app").rollout().status("--watch=true")
+            openshift.selector("dc/todo-app").rollout().latest()
+            openshift.selector("dc/todo-app").rollout().status("--watch=true")
 
-        openshift.tag("todo-app-int/todo-app:latest todo-app-prod/todo-app:latest")
+            openshift.tag("todo-app-int/todo-app:latest todo-app-prod/todo-app:latest")
+        }
     }
 }
 
 stage('prod') {
     node{
+        openshift.withProject( "todo-app-prod" ) {
+            def deploymentTemplate = openshift.process("-f infra/yml/todo-app-deployment-template.yml")
+            openshift.apply(deploymentTemplate)
 
-        def deploymentTemplate = openshift.process("-f infra/yml/todo-app-deployment-template.yml")
-        openshift.apply(deploymentTemplate)
-
-        openshift.selector("dc/todo-app").rollout().latest()
-        openshift.selector("dc/todo-app").rollout().status("--watch=true")
-
-        openshift.tag("todo-app-int/todo-app:latest todo-app-prod/todo-app:latest")
+            openshift.selector("dc/todo-app").rollout().latest()
+            openshift.selector("dc/todo-app").rollout().status("--watch=true")
+        }
     }
 }
 
