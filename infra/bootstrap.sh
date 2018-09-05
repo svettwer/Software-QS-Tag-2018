@@ -10,4 +10,4 @@ oc project todo-app-dev
 oc process -f infra/yml/jenkins_template.yml | oc apply -f -
 
 oc policy add-role-to-user edit system:serviceaccount:todo-app-dev:jenkins -n todo-app-int
-oc policy add-role-to-user edit system:serviceaccount:todo-app-int:jenkins -n todo-app-prod
+oc policy add-role-to-user edit system:serviceaccount:todo-app-dev:jenkins -n todo-app-prod
