@@ -14,7 +14,7 @@ stage('dev') {
             openshift.selector("dc/todo-app").rollout().latest()
             openshift.selector("dc/todo-app").rollout().status("--watch=true")
 
-            openshift.tag("todo-app-dev/todo-app:latest todo-app-int/todo-app::latest")
+            openshift.tag("todo-app-dev/todo-app:latest todo-app-int/todo-app:latest")
         }
     }
 }
