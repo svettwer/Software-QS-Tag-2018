@@ -34,4 +34,4 @@ parameters:
   displayName: Repository url
   description: The URL of the source repository
   required: true
-  value: https://github.com/svettwer/Software-QS-Tag-2018
+  value: http://gogs.192.168.99.101.nip.io/sven/todo-app.git
