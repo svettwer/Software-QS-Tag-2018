@@ -55,10 +55,14 @@ podTemplate(cloud: "openshift", namespace: "todo-app-int") {
                         "-l application=sakuli-s2i-testsuite")
             }
         }
+    }
+}
 
-        openshift.withProject( "todo-app-int" ) {
-            openshift.tag("todo-app-int/todo-app:latest todo-app-prod/todo-app:latest")
-        }
+stage('pre-production'){
+    input "Deploy to production?"
+
+    openshift.withProject( "todo-app-int" ) {
+        openshift.tag("todo-app-int/todo-app:latest todo-app-prod/todo-app:latest")
     }
 }
 
