@@ -29,5 +29,6 @@ oc start-build spring-offline-s2i
 oc process -f $(git rev-parse --show-toplevel)/paas/yml/s2i_sakuli_build_template.yml \
            -p SOURCE_REPOSITORY_URL=https://github.com/svettwer/Software-QS-Tag-2018.git \
            -p SOURCE_DOCKER_CONTEXT_DIR=paas/docker \
-           -p SOURCE_DOCKERFILE=sakuli_s2i_dockerfile| oc apply -f -
+           -p SOURCE_DOCKERFILE=sakuli_s2i_dockerfile \
+           -p BASE_IMAGE=consol/sakuli-centos-xfce:v1.1.0 | oc apply -f -
 oc start-build sakuli-s2i
