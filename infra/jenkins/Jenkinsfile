@@ -35,12 +35,7 @@ podTemplate(cloud: "openshift", namespace: "todo-app-int") {
                 openshift.selector("dc/todo-app").rollout().latest()
                 openshift.selector("dc/todo-app").rollout().status("--watch=true")
             }
-
             sh "mvn clean verify -Dskip.integration.tests=false"
-
-            openshift.withProject( "todo-app-int" ) {
-                openshift.tag("todo-app-int/todo-app:latest todo-app-prod/todo-app:latest")
-            }
         }
 
         stage('e2e-tests'){
@@ -52,14 +47,16 @@ podTemplate(cloud: "openshift", namespace: "todo-app-int") {
 
                 openshift.startBuild("sakuli-s2i-testsuite", "--wait=true")
 
-                sakuli-s2i-testsuite
-
                 openshift.run("sakuli-s2i-testsuite",
                         "--image=172.30.1.1:5000/todo-app-int/sakuli-s2i-testsuite:latest",
                         "--attach=true",
                         "--rm",
                         "--restart=Never")
             }
+        }
+
+        openshift.withProject( "todo-app-int" ) {
+            openshift.tag("todo-app-int/todo-app:latest todo-app-prod/todo-app:latest")
         }
     }
 }
