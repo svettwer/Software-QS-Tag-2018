@@ -46,20 +46,22 @@ podTemplate(cloud: "openshift", namespace: "todo-app-int") {
     }
 
     stage('e2e-tests'){
-        def buildTemplate = openshift.process("-f infra/yml/s2i-sakuli-build-template.yml",
-                "-p", "TESTSUITE_REPOSITORY_URL=http://gogs.192.168.99.101.nip.io/sven/todo-app.git",
-                "-p", "TESTSUITE_CONTEXT_DIR=e2e/testsuite")
-        openshift.apply(buildTemplate)
+        openshift.withProject( "todo-app-int" ) {
+            def buildTemplate = openshift.process("-f infra/yml/s2i-sakuli-build-template.yml",
+                    "-p", "TESTSUITE_REPOSITORY_URL=http://gogs.192.168.99.101.nip.io/sven/todo-app.git",
+                    "-p", "TESTSUITE_CONTEXT_DIR=e2e/testsuite")
+            openshift.apply(buildTemplate)
 
-        openshift.startBuild("sakuli-s2i-testsuite", "--wait=true")
+            openshift.startBuild("sakuli-s2i-testsuite", "--wait=true")
 
-        sakuli-s2i-testsuite
+            sakuli-s2i-testsuite
 
-        openshift.run("sakuli-s2i-testsuite",
-                "--image=172.30.1.1:5000/todo-app-int/sakuli-s2i-testsuite:latest",
-                "--attach=true",
-                "--rm",
-                "--restart=Never")
+            openshift.run("sakuli-s2i-testsuite",
+                    "--image=172.30.1.1:5000/todo-app-int/sakuli-s2i-testsuite:latest",
+                    "--attach=true",
+                    "--rm",
+                    "--restart=Never")
+        }
     }
 }
 
