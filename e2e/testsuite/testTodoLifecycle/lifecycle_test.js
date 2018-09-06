@@ -30,17 +30,6 @@ try {
     _click(_submit("Add"));
     testCase.endOfStep("Add todo entry", 10);
 
-    //Complete entry
-    _highlight(_listItem("Sample todox"));
-    _highlight(_checkbox("complete"));
-    _click(_checkbox("complete"));
-    testCase.endOfStep("Complete todo entry", 10);
-
-    //Delete entry
-    _highlight(_span("x"));
-    _click(_span("x"));
-    testCase.endOfStep("Delete todo entry", 10);
-
     //load images
     testCase.addImagePaths("centos_chrome");
 
@@ -53,6 +42,17 @@ try {
     env.type("a", Key.CTRL) //mark filename in "save under" dialog
         .type(pdfFilePath + Key.ENTER) //type filename and press ENTER
         .sleep(1);
+
+    //Complete entry
+    _highlight(_listItem("Sample todox"));
+    _highlight(_checkbox("complete"));
+    _click(_checkbox("complete"));
+    testCase.endOfStep("Complete todo entry", 10);
+
+    //Delete entry
+    _highlight(_span("x"));
+    _click(_span("x"));
+    testCase.endOfStep("Delete todo entry", 10);
 
 } catch (e) {
     testCase.handleException(e);
