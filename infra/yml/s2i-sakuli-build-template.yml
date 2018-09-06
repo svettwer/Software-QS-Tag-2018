@@ -106,3 +106,40 @@ objects:
     - imageChange: {}
       type: ImageChange
     - type: ConfigChange
+
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      description: Sakuli client vnc and http port
+    labels:
+      application: ${IMAGE}
+    name: ${IMAGE}
+  spec:
+    ports:
+    - name: http-port-tcp
+      protocol: TCP
+      port: 6901
+      targetPort: 6901
+    - name: vnc-port-tcp
+      protocol: TCP
+      port: 5901
+      targetPort: 5901
+    selector:
+      application: ${IMAGE}
+### Route -> Service config
+- apiVersion: v1
+  id: ${IMAGE}
+  kind: Route
+  metadata:
+    annotations:
+      description: Route for vnc's http service.
+    labels:
+      application: ${IMAGE}
+    name: ${IMAGE}
+  spec:
+    host: http://sakuli-test.192.168.99.101.nip.io
+    to:
+      name: ${IMAGE}
+    port:
+      targetPort: http-port-tcp
