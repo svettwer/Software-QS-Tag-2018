@@ -22,9 +22,9 @@ stage('dev') {
 
 
 
-podTemplate(cloud: "openshift", namespace: "todo-app-int") {
+stage('integration-tests') {
+    podTemplate(cloud: "openshift", namespace: "todo-app-int") {
 
-    stage('integration-tests') {
         node('maven'){
             checkout scm
 
@@ -44,8 +44,10 @@ podTemplate(cloud: "openshift", namespace: "todo-app-int") {
             }
         }
     }
+}
 
-    stage('e2e-tests'){
+stage('e2e-tests'){
+    node{
         openshift.withProject( "todo-app-int" ) {
             def buildTemplate = openshift.process("-f infra/yml/s2i-sakuli-build-template.yml",
                     "-p", "TESTSUITE_REPOSITORY_URL=http://gogs.192.168.99.101.nip.io/sven/todo-app.git",
