@@ -1,0 +1,50 @@
+continuous integration
+OKD
+Configuration as code
+Jenkins
+git
+Source to Image
+Deployment config
+Docker
+system under test
+integration testing
+Spring
+critical paths
+cloud environments
+Selenium 
+Kubernetes
+Open Monitoring Distribution
+OpenShift
+Sakuli
+Citrus
+CI/CD pipelines
+Test Pyramid
+extreme programming
+Continuous delivery
+PaaS
+image streams
+Monolith
+Microservice
+Chaos engineering
+Low code plattform
+AWS
+Blockchain
+Artificial intelligence
+Machine learning
+Cryptocurrency
+Augmented reality
+Virtual reality
+Quantum computing
+Infrastructure as code
+IaaS
+SaaS
+Kubermatic
+Go
+Resilience
+12 factor app
+T-shaped people
+Wiremock
+TestNG
+JUnit
+Testcontainers
+Deployment Monolith
