@@ -19,13 +19,14 @@ oc login -u system:admin
 oc new-project gogs
 oc new-app -f http://bit.ly/openshift-gogs-template --param=HOSTNAME=gogs.$(minishift ip).nip.io
 #First registered user is admin
-#Manual import of the infra code required https://github.com/svettwer/Software-QS-Tag-2018
+#Manual import of the project into gogs required https://github.com/svettwer/Software-QS-Tag-2018 as 'todo-app'
 
 #Setup offline s2i build
 oc project openshift
 oc process -f $(git rev-parse --show-toplevel)/paas/yml/s2i_spring_offline_build_template.yml | oc apply -f -
 oc start-build spring-offline-s2i
 
+#Add a customized sakuli s2i image
 oc process -f $(git rev-parse --show-toplevel)/paas/yml/s2i_sakuli_build_template.yml \
            -p SOURCE_REPOSITORY_URL=https://github.com/svettwer/Software-QS-Tag-2018.git \
            -p SOURCE_DOCKER_CONTEXT_DIR=paas/docker \
