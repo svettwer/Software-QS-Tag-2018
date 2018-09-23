@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.sonsol.citrus.samples.todolist;
+package com.consol.citrus.samples.todolist;
 
 import com.consol.citrus.dsl.endpoint.CitrusEndpoints;
 import com.consol.citrus.http.client.HttpClient;

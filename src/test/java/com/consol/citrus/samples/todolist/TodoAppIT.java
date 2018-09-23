@@ -1,4 +1,4 @@
-package com.sonsol.citrus.samples.todolist;
+package com.consol.citrus.samples.todolist;
 
 import org.testng.annotations.Test;
 
