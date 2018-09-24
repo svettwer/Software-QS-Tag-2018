@@ -24,7 +24,7 @@ oc new-app -f http://bit.ly/openshift-gogs-template --param=HOSTNAME=gogs.$(mini
 #Setup offline s2i build
 oc project openshift
 oc process -f $(git rev-parse --show-toplevel)/paas/yml/s2i_spring_offline_build_template.yml | oc apply -f -
-oc start-build spring-offline-s2i
+oc start-build -w spring-offline-s2i
 
 #Add a customized sakuli s2i image
 oc process -f $(git rev-parse --show-toplevel)/paas/yml/s2i_sakuli_build_template.yml \
@@ -32,4 +32,4 @@ oc process -f $(git rev-parse --show-toplevel)/paas/yml/s2i_sakuli_build_templat
            -p SOURCE_DOCKER_CONTEXT_DIR=paas/docker \
            -p SOURCE_DOCKERFILE=sakuli_s2i_dockerfile \
            -p BASE_IMAGE=consol/sakuli-centos-xfce:v1.1.0 | oc apply -f -
-oc start-build sakuli-s2i
+oc start-build -w sakuli-s2i
