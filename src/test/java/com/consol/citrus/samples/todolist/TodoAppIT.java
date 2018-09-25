@@ -1,5 +1,6 @@
 package com.consol.citrus.samples.todolist;
 
+import com.consol.citrus.dsl.testng.TestNGCitrusTestRunner;
 import org.testng.annotations.Test;
 
 import com.consol.citrus.annotations.CitrusTest;
@@ -10,7 +11,7 @@ import com.consol.citrus.message.MessageType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 
-public class TodoAppIT extends TestNGCitrusTestDesigner {
+public class TodoAppIT extends TestNGCitrusTestRunner {
 
     @Autowired
     private HttpClient todoClient;
@@ -18,15 +19,13 @@ public class TodoAppIT extends TestNGCitrusTestDesigner {
     @Test
     @CitrusTest
     public void testGet() {
-        http()
-                .client(todoClient)
+        http(http -> http.client(todoClient)
                 .send()
-                .get("/api/todolist/");
+                .get("/api/todolist/"));
 
-        http()
-                .client(todoClient)
+        http(http -> http.client(todoClient)
                 .receive()
-                .response(HttpStatus.OK);
+                .response(HttpStatus.OK));
     }
 
     @Test
@@ -36,8 +35,7 @@ public class TodoAppIT extends TestNGCitrusTestDesigner {
         variable("todoName", "citrus:concat('todo_', citrus:randomNumber(4))");
         variable("todoDescription", "Description: ${todoName}");
 
-        http()
-                .client(todoClient)
+        http(http -> http.client(todoClient)
                 .send()
                 .post("/api/todolist")
                 .messageType(MessageType.JSON)
@@ -45,40 +43,35 @@ public class TodoAppIT extends TestNGCitrusTestDesigner {
                 .payload("{ \"id\": \"${todoId}\", " +
                         "\"title\": \"${todoName}\", " +
                         "\"description\": \"${todoDescription}\", " +
-                        "\"done\": false}");
+                        "\"done\": false}"));
 
-        http()
-                .client(todoClient)
+        http(http -> http.client(todoClient)
                 .receive()
                 .response(HttpStatus.OK)
                 .messageType(MessageType.PLAINTEXT)
-                .payload("${todoId}");
+                .payload("${todoId}"));
 
-        http()
-                .client(todoClient)
+        http(http -> http.client(todoClient)
                 .send()
                 .get("/api/todo/${todoId}")
-                .accept("application/json");
+                .accept("application/json"));
 
-        http()
-                .client(todoClient)
+        http(http -> http.client(todoClient)
                 .receive()
                 .response(HttpStatus.OK)
                 .messageType(MessageType.JSON)
                 .validate("$.id", "${todoId}")
                 .validate("$.title", "${todoName}")
                 .validate("$.description", "${todoDescription}")
-                .validate("$.done", false);
+                .validate("$.done", false));
 
-        http()
-                .client(todoClient)
+        http(http -> http.client(todoClient)
                 .send()
                 .delete("/api/todo/${todoId}")
-                .accept("application/json");
+                .accept("application/json"));
 
-        http()
-                .client(todoClient)
+        http(http -> http.client(todoClient)
                 .receive()
-                .response(HttpStatus.OK);
+                .response(HttpStatus.OK));
     }
 }
