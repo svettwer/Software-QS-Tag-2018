@@ -3,18 +3,8 @@ stage('dev') {
         checkout scm
 
         openshift.withProject( "todo-app-dev" ) {
-            def buildTemplate = openshift.process("-f infra/yml/s2i-todo-app-build-template.yml")
-            openshift.apply(buildTemplate)
-
-            openshift.startBuild("todo-app", "--wait=true")
-
-            def deploymentTemplate = openshift.process("-f infra/yml/todo-app-deployment-template.yml",
-                    "-p", "URL=todo-app-dev.192.168.99.101.nip.io")
-            openshift.apply(deploymentTemplate)
-
-            openshift.selector("dc/todo-app").rollout().latest()
-            openshift.selector("dc/todo-app").rollout().status("--watch=true")
-
+            buildTodoApp()
+            deployTodoApp("todo-app-dev.192.168.99.101.nip.io")
             openshift.tag("todo-app-dev/todo-app:latest todo-app-int/todo-app:latest")
         }
     }
@@ -28,31 +18,16 @@ podTemplate(cloud: "openshift", namespace: "todo-app-int") {
 
         stage('integration-tests') {
             openshift.withProject( "todo-app-int" ) {
-                def deploymentTemplate = openshift.process("-f infra/yml/todo-app-deployment-template.yml",
-                        "-p", "URL=todo-app-int.192.168.99.101.nip.io")
-                openshift.apply(deploymentTemplate)
-
-                openshift.selector("dc/todo-app").rollout().latest()
-                openshift.selector("dc/todo-app").rollout().status("--watch=true")
+                deployTodoApp("todo-app-int.192.168.99.101.nip.io")
             }
+
             sh "mvn clean verify -Dskip.integration.tests=false"
         }
 
         stage('e2e-tests'){
             openshift.withProject( "todo-app-int" ) {
-                def buildTemplate = openshift.process("-f infra/yml/s2i-sakuli-build-template.yml",
-                        "-p", "TESTSUITE_REPOSITORY_URL=http://gogs.192.168.99.101.nip.io/sven/todo-app.git",
-                        "-p", "TESTSUITE_CONTEXT_DIR=e2e/testsuite")
-                openshift.apply(buildTemplate)
-
-                openshift.startBuild("sakuli-s2i-testsuite", "--wait=true")
-
-                openshift.run("sakuli-s2i-testsuite",
-                        "--image=172.30.1.1:5000/todo-app-int/sakuli-s2i-testsuite:latest",
-                        "--attach=true",
-                        "--rm",
-                        "--restart=Never",
-                        "-l application=sakuli-s2i-testsuite")
+                buildSakuliTestContainer()
+                runSakuliTestContainer()
             }
         }
 
@@ -65,16 +40,44 @@ podTemplate(cloud: "openshift", namespace: "todo-app-int") {
         }
     }
 }
-
 stage('prod') {
     node{
         openshift.withProject( "todo-app-prod" ) {
-            def deploymentTemplate = openshift.process("-f infra/yml/todo-app-deployment-template.yml")
-            openshift.apply(deploymentTemplate)
-
-            openshift.selector("dc/todo-app").rollout().latest()
-            openshift.selector("dc/todo-app").rollout().status("--watch=true")
+            deployTodoApp("todo-app.192.168.99.101.nip.io")
         }
     }
 }
 
+private void buildTodoApp() {
+    def buildTemplate = openshift.process("-f infra/yml/s2i-todo-app-build-template.yml")
+    openshift.apply(buildTemplate)
+
+    openshift.startBuild("todo-app", "--wait=true")
+}
+
+private void deployTodoApp(String routeUrl) {
+    def deploymentTemplate = openshift.process("-f infra/yml/todo-app-deployment-template.yml",
+            "-p", "URL=" + routeUrl)
+    openshift.apply(deploymentTemplate)
+
+    openshift.selector("dc/todo-app").rollout().latest()
+    openshift.selector("dc/todo-app").rollout().status("--watch=true")
+}
+
+private void runSakuliTestContainer() {
+    openshift.run("sakuli-s2i-testsuite",
+            "--image=172.30.1.1:5000/todo-app-int/sakuli-s2i-testsuite:latest",
+            "--attach=true",
+            "--rm",
+            "--restart=Never",
+            "-l application=sakuli-s2i-testsuite")
+}
+
+private void buildSakuliTestContainer() {
+    def buildTemplate = openshift.process("-f infra/yml/s2i-sakuli-build-template.yml",
+            "-p", "TESTSUITE_REPOSITORY_URL=http://gogs.192.168.99.101.nip.io/sven/todo-app.git",
+            "-p", "TESTSUITE_CONTEXT_DIR=e2e/testsuite")
+    openshift.apply(buildTemplate)
+
+    openshift.startBuild("sakuli-s2i-testsuite", "--wait=true")
+}
