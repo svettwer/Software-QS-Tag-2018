@@ -22,3 +22,6 @@ Please have a look at the script for the manual import of the todo-app repositor
 into the local gogs setup. After cloning/forking the repository and setting up the paas, 
 it may be required to change the repository references in the *infra* configuration files
 depending on the user name you've chosen for your gogs installation.
+In addition, it may be required to change the ip addresses in the configuration files
+depending the ip address that has been assigned to your cluster. I recommend a search and
+replace for `192.168.99.101` to the ip delivered by the command `minishift ip`
