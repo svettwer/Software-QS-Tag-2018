@@ -31,7 +31,7 @@ public class EndpointConfig {
     public HttpClient todoClient() {
         return CitrusEndpoints.http()
                             .client()
-                            .requestUrl("http://todo-app-int.us-east-1.elasticbeanstalk.com")
+                            .requestUrl(System.getenv("API_ENDPOINT"))
                             .build();
     }
 }
