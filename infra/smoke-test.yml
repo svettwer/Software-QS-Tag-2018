@@ -1,0 +1,11 @@
+version: 0.2
+env:
+  variables:
+    API_ENDPOINT: "http://todo-app-dev.us-east-1.elasticbeanstalk.com/"
+phases:
+  build:
+    commands:
+    - mvn clean verify -Dit.test=TodoAppIT#testGet -Dskip.integration.tests=false
+cache:
+  paths:
+  - '/root/.m2/**/*'
